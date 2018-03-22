@@ -84,7 +84,7 @@ func New() string {
 // argument.
 func NewLen(length int) (id string) {
 	id = randomId()
-	globalStore.Set(id, RandomDigits(length))
+	globalStore.Set(id, RandomCaptcha(length))
 	return
 }
 
@@ -99,7 +99,7 @@ func Reload(id string) bool {
 	if old == nil {
 		return false
 	}
-	globalStore.Set(id, RandomDigits(len(old)))
+	globalStore.Set(id, RandomCaptcha(len(old)))
 	return true
 }
 
@@ -149,17 +149,5 @@ func VerifyString(id string, digits string) bool {
 	if digits == "" {
 		return false
 	}
-	ns := make([]byte, len(digits))
-	for i := range ns {
-		d := digits[i]
-		switch {
-		case '0' <= d && d <= '9':
-			ns[i] = d - '0'
-		case d == ' ' || d == ',':
-			// ignore
-		default:
-			return false
-		}
-	}
-	return Verify(id, ns)
+	return Verify(id, captchaToBytes(digits))
 }

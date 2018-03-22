@@ -18,6 +18,9 @@ const idLen = 20
 // idChars are characters allowed in captcha id.
 var idChars = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
 
+var captchaCharSet = []byte("123456789ABCEFHJKLMNPRSTUVXYZ")
+var captchaCharIndexMap = map[byte]byte{}
+
 // rngKey is a secret key used to deterministically derive seeds for
 // PRNGs used in image and audio. Generated once during initialization.
 var rngKey [32]byte
@@ -25,6 +28,10 @@ var rngKey [32]byte
 func init() {
 	if _, err := io.ReadFull(rand.Reader, rngKey[:]); err != nil {
 		panic("captcha: error reading random source: " + err.Error())
+	}
+
+	for index, b := range captchaCharSet {
+		captchaCharIndexMap[b] = byte(index)
 	}
 }
 
@@ -53,11 +60,21 @@ func deriveSeed(purpose byte, id string, digits []byte) (out [16]byte) {
 	return
 }
 
+func captchaToBytes(captchaWords string) []byte {
+	bts := []byte{}
+	for _, b := range []byte(captchaWords) {
+		if index, found := captchaCharIndexMap[b]; found {
+			bts = append(bts, byte(index))
+		}
+	}
+	return bts
+}
+
 // RandomDigits returns a byte slice of the given length containing
 // pseudorandom numbers in range 0-9. The slice can be used as a captcha
 // solution.
-func RandomDigits(length int) []byte {
-	return randomBytesMod(length, 10)
+func RandomCaptcha(length int) []byte {
+	return randomBytesMod(length, byte(len(captchaCharSet)))
 }
 
 // randomBytes returns a byte slice of the given length read from CSPRNG.
