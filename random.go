@@ -18,7 +18,9 @@ const idLen = 20
 // idChars are characters allowed in captcha id.
 var idChars = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
 
-var captchaCharSet = []byte("123456789ABCEFHJKLMNPRSTUVXYZ")
+var captchaCharSet = []byte("0123456789")
+
+// var captchaCharSet = []byte("123456789ABCEFHJKLMNPRSTUVXYZ")
 var captchaCharIndexMap = map[byte]byte{}
 
 // rngKey is a secret key used to deterministically derive seeds for
